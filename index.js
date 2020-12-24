@@ -1,4 +1,4 @@
-const socket = require('net');
+const net = require('net');
 const cluster = require('cluster'); // clusters will be used for multi-threading
 const CPUs = require('os').cpus().length; // number of CPU cores
 
@@ -14,7 +14,7 @@ if (cluster.isMaster) {
 } else {
   // child process
   // create TCP socket
-  const server = socket.createServer().on('connection', (socket) => {
+  const server = net.createServer().on('connection', (socket) => {
     console.log('A connection is established');
 
     socket.on('data', function (buffer) {
@@ -22,7 +22,7 @@ if (cluster.isMaster) {
       console.log(`============================\n${buffer.toString()}`);
 
       const request = buffer.toString();
-      const [method, url, protocol] = request.split(/\r\n/g)[0].split(' ');
+      const [method, url, protocol] = request.split(/\r\n|\n|\r/)[0].split(' ');
 
       // print information
       console.log({ method, url, protocol });
