@@ -7,7 +7,7 @@ const PORT = 8080;
 if (cluster.isMaster) {
   console.log(`Parent process is started ${process.pid}`);
   console.log(`x${CPUs} child processes being created.`);
-  // forst child processes
+  // fork child processes
   for (let i = 0; i < CPUs; i++) {
     cluster.fork();
   }
