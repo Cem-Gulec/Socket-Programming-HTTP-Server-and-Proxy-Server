@@ -3,7 +3,7 @@ const cluster = require('cluster'); // clusters will be used for multi-threading
 const CPUs = require('os').cpus().length; // number of CPU cores
 const { save, retrieve } = require('./cache');
 
-const PORT = 8888;
+const PORT = process.argv[2];
 
 if (cluster.isMaster) {
   console.log(`Parent process is started ${process.pid}`);
@@ -44,6 +44,7 @@ if (cluster.isMaster) {
             // return Request-URI Too Long
             socket.write('HTTP/1.1 414 Request-URI Too Long\n\n');
             socket.end();
+            return;
           }
 
           // Check the cache whether requested object is exist

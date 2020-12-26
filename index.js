@@ -2,7 +2,7 @@ const net = require('net');
 const cluster = require('cluster'); // clusters will be used for multi-threading
 const CPUs = require('os').cpus().length; // number of CPU cores
 
-const PORT = 8080;
+const PORT = process.argv[2];
 
 if (cluster.isMaster) {
   console.log(`Parent process is started ${process.pid}`);
@@ -27,7 +27,6 @@ if (cluster.isMaster) {
       // print information
       console.log({ method, url, protocol });
 
-      // TODO: RFC2068'de hangi headerler zorunlu kontrol et!
       if (method == 'GET') {
         let size = url.length > 1 ? parseInt(url.substr(1)) : 0;
         if (size >= 100 && size <= 20000) {
@@ -38,9 +37,14 @@ if (cluster.isMaster) {
             `<html><head></head><body>${'a'.repeat(size - 39)}</body></html>`;
           // 'a'.repeat(size);
           socket.write(responseObject);
+          console.log(`\n[${process.pid}] Data sent to the client:`);
+          console.log(`============================\n${responseObject}`);
         } else {
-          console.log('Requested URI is not a number');
-          socket.write('HTTP/1.1 400 Bad Request\n\n');
+          console.log('Not a valid request');
+          const responseObject = 'HTTP/1.1 400 Bad Request\n\n';
+          socket.write(responseObject);
+          console.log(`\n[${process.pid}] Data sent to the client:`);
+          console.log(`============================\n${responseObject}`);
         }
       } else if (
         method == 'POST' ||
@@ -52,11 +56,17 @@ if (cluster.isMaster) {
       ) {
         // not implemented
         console.log('HTTP method is not implemented!');
-        socket.write('HTTP/1.1 501 Not Implemented\n\n');
+        const responseObject = 'HTTP/1.1 501 Not Implemented\n\n';
+        socket.write(responseObject);
+        console.log(`\n[${process.pid}] Data sent to the client:`);
+        console.log(`============================\n${responseObject}`);
       } else {
         // not a valied HTTP method -> Bad Request” (400)
         console.log('Not a valid HTTP method!');
-        socket.write('HTTP/1.1 400 Bad Request\n\n');
+        const responseObject = 'HTTP/1.1 400 Bad Request\n\n';
+        socket.write(responseObject);
+        console.log(`\n[${process.pid}] Data sent to the client:`);
+        console.log(`============================\n${responseObject}`);
       }
       socket.end();
     });
